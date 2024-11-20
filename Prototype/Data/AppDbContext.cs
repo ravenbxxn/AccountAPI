@@ -83,39 +83,12 @@ namespace APIPrototype.Data
 
         public DbSet<Mas_HREmployment> Mas_HREmployment { get; set; }
 
-        public DbSet<StockCardViewModel> StockCardView { get; set; }
-
-        public DbSet<StockOnHandViewModel> StockOnHandView { get; set; }
-
-        public DbSet<JVViewModel> JVView { get; set; }
-
-        public DbSet<SumBalanceViewModel> SumBalanceView { get; set; }
-
-        public DbSet<TrailBalanceViewModel> TrailBalanceView { get; set; }
-
-        public DbSet<AccCodeViewModel> AccCodeView { get; set; }
-
-        public DbSet<WarehouseViewModel> WarehouseView { get; set; }
-
-        public DbSet<ProductTypeViewModel> ProductTypeView { get; set; }
-
-        public DbSet<ProductViewModel> ProductView { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // กำหนดว่า View นี้ไม่มี Key
-            modelBuilder.Entity<StockCardViewModel>().HasNoKey();
-            modelBuilder.Entity<StockOnHandViewModel>().HasNoKey();
-            modelBuilder.Entity<JVViewModel>().HasNoKey();
-            modelBuilder.Entity<SumBalanceViewModel>().HasNoKey();
-            modelBuilder.Entity<TrailBalanceViewModel>().HasNoKey();
-            modelBuilder.Entity<AccCodeViewModel>().HasNoKey();
-            modelBuilder.Entity<WarehouseViewModel>().HasNoKey();
-            modelBuilder.Entity<ProductTypeViewModel>().HasNoKey();
-            modelBuilder.Entity<ProductViewModel>().HasNoKey();
            
             // กำหนดว่า View นี้มี Key มากกว่า 1
             modelBuilder.Entity<Acc_TransactionDT>()

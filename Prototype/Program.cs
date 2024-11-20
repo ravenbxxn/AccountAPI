@@ -54,7 +54,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ลงทะเบียน Service ต่าง ๆ
-builder.Services.AddScoped<ViewService>();
+//builder.Services.AddScoped<ViewService>();
 builder.Services.AddScoped<StoredProceduresService>();
 
 // เพิ่มการตั้งค่า Authentication ด้วย JWT

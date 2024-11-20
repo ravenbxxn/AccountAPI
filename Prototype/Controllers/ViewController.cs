@@ -1,6 +1,7 @@
-﻿/*using APIPrototype.Services;
+﻿using APIPrototype.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using static APIPrototype.Models.View_Model;
 
 namespace APIPrototype.Controllers
@@ -9,76 +10,73 @@ namespace APIPrototype.Controllers
     [ApiController]
     public class ViewController : ControllerBase
     {
-        private readonly ViewService _service;
+        private readonly IConfiguration _configuration;
 
-        public ViewController(ViewService service)
+        public ViewController(IConfiguration configuration)
         {
-            _service = service;
+            _configuration = configuration;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetStockCard()
+        [HttpPost]
+        public async Task<IActionResult> GetViewResult([FromBody] ViewRequest request)
         {
-            var stockcard = await _service.GetStockCardsAsync();
-            return Ok(stockcard);
+            if (string.IsNullOrEmpty(request.ViewName))
+            {
+                return BadRequest("ViewName is required.");
+            }
+
+            try
+            {
+                // ใช้ SELECT * หากไม่ได้ส่ง Results มา
+                string selectClause = request.Results == null || !request.Results.Any()
+                    ? "*"
+                    : string.Join(", ", request.Results.Select(r => $"{r.SourceField} AS {r.Alias ?? r.SourceField}"));
+
+                // ไม่มี WHERE Clause หาก Parameters เป็น null หรือว่าง
+                string whereClause = request.Parameters != null && request.Parameters.Any()
+                    ? "WHERE " + string.Join(" AND ",
+                        request.Parameters.Select(p => $"{p.Field} = @{p.Field}"))
+                    : string.Empty;
+
+                // สร้าง SQL
+                string sql = $"SELECT {selectClause} FROM {request.ViewName} {whereClause}";
+
+                // ดึงข้อมูลจากฐานข้อมูล
+                var result = await ExecuteDynamicQueryAsync(sql, request.Parameters);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetStockOnHand()
+        private async Task<IEnumerable<Dictionary<string, object>>> ExecuteDynamicQueryAsync(
+            string sql, IEnumerable<Parameter> parameters)
         {
-            var stockOnHand = await _service.GetStockOnHandsAsync();
-            return Ok(stockOnHand);
-        }
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
 
-        [HttpGet]
-        public async Task<IActionResult> GetJV(string? JournalNo = null)
-        {
-            var JV = await _service.GetJVsAsync(JournalNo);
-            return Ok(JV);
-        }
+            using var command = new SqlCommand(sql, connection);
+            if (parameters != null)
+            {
+                foreach (var param in parameters)
+                {
+                    command.Parameters.AddWithValue($"@{param.Field}", param.Value);
+                }
+            }
 
-        [HttpGet]
-        public async Task<IActionResult> GetSumBalance(string? accMainCode = null, string? accMainName = null)
-        {
-            var sumBalance = await _service.GetSumBalancesAsync(accMainCode, accMainName);
-            return Ok(sumBalance);
-        }
+            var result = new List<Dictionary<string, object>>();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var row = Enumerable.Range(0, reader.FieldCount)
+                    .ToDictionary(reader.GetName, reader.GetValue);
+                result.Add(row);
+            }
 
-        [HttpGet]
-        public async Task<IActionResult> GetTrailBalance(string? accCode = null, string? accMainCode = null)
-        {
-            var trailBalance = await _service.GetTrailBalancesAsync(accCode, accMainCode);
-            return Ok(trailBalance);
+            return result;
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAccCode(string? accCode = null, string? accMainCode = null, string? accTypeName = null)
-        {
-            var accCodes = await _service.GetAccCodesAsync(accCode, accMainCode, accTypeName);
-            return Ok(accCodes);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetWarehouse()
-        {
-            var warehouse = await _service.GetWarehousesAsync();
-            return Ok(warehouse);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetProductType()
-        {
-            var productType = await _service.GetProductTypesAsync();
-            return Ok(productType);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetProduct()
-        {
-            var product = await _service.GetProductsAsync();
-            return Ok(product);
-        }
-
     }
 }
-*/

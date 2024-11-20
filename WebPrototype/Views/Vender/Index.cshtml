@@ -1,0 +1,97 @@
+﻿@model IEnumerable<WebPrototype.Models.Mas_Vender>
+
+@{
+    ViewData["Title"] = "Vender";
+}
+
+<h1 class="text-center">Vender List</h1>
+
+<p>
+    <a class="btn btn-success" asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.VenCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BranchCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaxNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.English)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TAddress1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EAddress1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FaxNumber)
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.VenCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BranchCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TaxNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.English)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TAddress1)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EAddress1)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FaxNumber)
+            </td>
+            <td>              
+                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.VenCode">Edit</a>
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ })
+            </td>
+            <td>
+                <form asp-action="Delete" asp-route-id="@item.VenCode" onsubmit="return confirm('Are you sure you want to delete this [@item.TName] vender?');">
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,119 @@
+﻿@model WebPrototype.Models.Acc_Profile
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1 class="text-center">เพิ่มข้อมูลรายละเอียดกิจการ</h1>
+<hr />
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">ชื่อบริษัท :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="THName" type="text" class="form-control" value="" />
+                <span asp-validation-for="THName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">ชื่อบริษัทภาษาอังกฤษ :</label>
+        </div>
+        <div class="col-sm-4">
+            <input asp-for="ENName" type="text" class="form-control" value="" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">ที่อยู่ :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="THAddress1" type="text" class="form-control" value="" />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">ที่อยู่ภาษาอังกฤษ :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="EAddress1" type="text" class="form-control" value="" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="THAddress2" type="text" class="form-control" value="" />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="EAddress2" type="text" class="form-control" value="" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">หมายเลขโทรศัพท์ :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="TelPhoneFax" type="text" class="form-control" value="" />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">ประเภทของกิจการ :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="ProfileType" type="text" class="form-control" value="" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">เลขประจำตัวผู้เสียภาษี :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="TaxNumber" type="text" class="form-control" value="" />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">สาขา :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="Branch" type="text" class="form-control" value="" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <label style="font-weight: bold;">เลขทะเบียนการค้า :</label>
+        </div>
+        <div class="col-sm-4">
+            <div style="display:flex;width:100%;">
+                <input asp-for="BusRegisNum" type="text" class="form-control" value="" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+        <a class="btn btn-danger" asp-action="Index">Cancel</a>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

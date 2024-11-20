@@ -1,0 +1,155 @@
+﻿@model IEnumerable<WebPrototype.Models.Mas_SrvSingle>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="text-center">SrvSingle List</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SICode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NameThai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NameEng)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StdPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitCharge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CurrencyCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DefaultVender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProcessDesc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GLAccountCodeSales)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GLAccountCodeCost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsTaxCharge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Is50Tavi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rate50Tavi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCredit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsExpense)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsShowPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsHaveSlip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsPay50TaviTo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsLtdAdv50Tavi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsUsedCoSlip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GroupCode)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SICode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NameThai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NameEng)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StdPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitCharge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurrencyCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DefaultVender)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProcessDesc)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GLAccountCodeSales)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GLAccountCodeCost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsTaxCharge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Is50Tavi)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rate50Tavi)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsCredit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsExpense)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsShowPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsHaveSlip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsPay50TaviTo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsLtdAdv50Tavi)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsUsedCoSlip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GroupCode)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

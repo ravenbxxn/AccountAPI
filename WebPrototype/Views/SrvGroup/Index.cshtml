@@ -1,0 +1,95 @@
+﻿@model IEnumerable<WebPrototype.Models.Mas_SrvGroup>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="text-center">SrvGroup List</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.GroupCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GroupName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GLAccountCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsApplyPolicy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsTaxCharge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Is50Tavi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rate50Tavi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCredit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsExpense)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsHaveSlip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsLtdAdv50Tavi)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GroupCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GroupName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GLAccountCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsApplyPolicy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsTaxCharge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Is50Tavi)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rate50Tavi)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsCredit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsExpense)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsHaveSlip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsLtdAdv50Tavi)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

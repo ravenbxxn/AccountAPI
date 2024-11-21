@@ -57,6 +57,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //builder.Services.AddScoped<ViewService>();
 builder.Services.AddScoped<StoredProceduresService>();
 
+/*builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorOrigin",
+        policy => policy.WithOrigins("https://localhost:44372")  // กำหนดโดเมนของ Blazor
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});*/
+
 // เพิ่มการตั้งค่า Authentication ด้วย JWT
 builder.Services.AddAuthentication(options =>
 {
@@ -87,7 +95,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+/*app.UseCors("AllowBlazorOrigin");*/
 // เรียกใช้งาน Middleware สำหรับ Authentication และ Authorization
 app.UseAuthentication();  // ใช้สำหรับตรวจสอบ JWT Token
 app.UseAuthorization();

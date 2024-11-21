@@ -1,6 +1,9 @@
 ﻿using APIPrototype.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Dynamic;
 using System.Text.Json;
 using static APIPrototype.Models.StoredProcedures_Model;
 
@@ -15,13 +18,12 @@ namespace APIPrototype.Services
             _db = db;
         }
 
-        public async Task<int> ExecuteStoredProcedureAsync(ProcedureRequest request)
+        public async Task<dynamic> ExecuteStoredProcedureAsync(ProcedureRequest request)
         {
             var parameters = new List<SqlParameter>();
 
             foreach (var param in request.Parameters)
             {
-                // ตรวจสอบและแปลงค่าจาก JsonElement เป็นชนิดข้อมูลที่รองรับ
                 object value = param.Value is JsonElement jsonElement ? jsonElement.ValueKind switch
                 {
                     JsonValueKind.String => jsonElement.GetString(),
@@ -35,12 +37,49 @@ namespace APIPrototype.Services
                 parameters.Add(new SqlParameter($"@{param.Param}", value ?? DBNull.Value));
             }
 
-            var result = await _db.Database.ExecuteSqlRawAsync(
-                $"EXEC {request.Name} {string.Join(", ", parameters.Select(p => p.ParameterName))}",
-                parameters.ToArray()
-            );
+            using (var command = _db.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = $"EXEC {request.Name} {string.Join(", ", parameters.Select(p => p.ParameterName))}";
+                command.CommandType = CommandType.Text;
 
-            return result;
+                foreach (var param in parameters)
+                {
+                    command.Parameters.Add(param);
+                }
+
+                if (command.Connection.State != ConnectionState.Open)
+                    await command.Connection.OpenAsync();
+
+                // อ่านข้อมูลจาก SELECT (ExecuteReaderAsync)
+                var resultList = new List<dynamic>();
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var row = new ExpandoObject() as IDictionary<string, Object>;
+
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            row.Add(reader.GetName(i), reader.GetValue(i));
+                        }
+
+                        resultList.Add(row);
+                    }
+                }
+
+                // ตอนนี้ปิด DataReader แล้ว เราสามารถใช้ ExecuteNonQueryAsync
+                var rowsAffected = await command.ExecuteNonQueryAsync();
+
+                // ส่งข้อมูลทั้งสอง (Data + RowsAffected)
+                var resultWithDataAndCount = new
+                {
+                    RowsAffected = rowsAffected,  // จำนวนแถวที่ถูกเพิ่มหรืออัพเดต
+                    Data = resultList,            // ข้อมูลจาก SELECT
+                    Message = "Stored procedure executed successfully."
+                };
+
+                return resultWithDataAndCount;
+            }
         }
     }
 }

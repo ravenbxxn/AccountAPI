@@ -65,6 +65,17 @@ builder.Services.AddScoped<StoredProceduresService>();
                         .AllowAnyHeader());
 });*/
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // เพิ่มการตั้งค่า Authentication ด้วย JWT
 builder.Services.AddAuthentication(options =>
 {
@@ -95,7 +106,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-/*app.UseCors("AllowBlazorOrigin");*/
+app.UseCors("AllowAll");
+//app.UseCors("AllowBlazorOrigin");
 // เรียกใช้งาน Middleware สำหรับ Authentication และ Authorization
 app.UseAuthentication();  // ใช้สำหรับตรวจสอบ JWT Token
 app.UseAuthorization();

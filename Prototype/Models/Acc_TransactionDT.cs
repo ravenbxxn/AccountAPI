@@ -50,5 +50,11 @@ namespace APIPrototype.Models
         [Required]
         [StringLength(255)]
         public string SalesDescription { get; set; } = null!;
+
+        public double? RateVat { get; set; }
+
+        public double? RateWht { get; set; }
+
+        public double? VatType { get; set; }
     }
 }

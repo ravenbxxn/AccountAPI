@@ -292,6 +292,24 @@ namespace APIPrototype.Controllers
 
                 foreach (var obj in objs)
                 {
+                    if (string.IsNullOrEmpty(obj.AccDocNo))
+                    {
+                        return BadRequest("AccDocNo is required.");
+                    }
+
+                    // หา AccItemNo ล่าสุดที่ตรงกับ AccDocNo
+                    var latestItem = _db.Acc_TransactionDT
+                        .Where(x => x.AccDocNo == obj.AccDocNo)
+                        .OrderByDescending(x => x.AccItemNo)
+                        .FirstOrDefault();
+
+                    // หากยังไม่มี AccItemNo ให้เริ่มต้นที่ 1
+                    int nextItemNo = latestItem == null ? 1 : latestItem.AccItemNo + 1;
+
+                    // กำหนดค่า AccItemNo ใหม่
+                    obj.AccItemNo = nextItemNo;
+
+                    // เพิ่มข้อมูลลงใน context
                     _db.Acc_TransactionDT.Add(obj);
                 }
 

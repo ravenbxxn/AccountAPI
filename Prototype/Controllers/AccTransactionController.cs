@@ -76,9 +76,16 @@ namespace APIPrototype.Controllers
                     hasCriteria = true;
                 }
 
-                if (!string.IsNullOrEmpty(accDocType))
+                /*if (!string.IsNullOrEmpty(accDocType))
                 {
                     queryable = queryable.Where(item => item.AccDocType == accDocType);
+                    hasCriteria = true;
+                }*/
+
+                if (!string.IsNullOrEmpty(accDocType)) // รับค่า accDocType หลายตัว เช่น ?accDocType=PO,DI
+                {
+                    var accDocTypeList = accDocType.Split(','); // แยกค่าด้วย Comma
+                    queryable = queryable.Where(item => accDocTypeList.Contains(item.AccDocType));
                     hasCriteria = true;
                 }
 

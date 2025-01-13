@@ -61,7 +61,17 @@ namespace APIPrototype.Controllers
                     hasCriteria = true;
                 }
 
-                var journalHDs = queryable.ToList();
+                var journalHDs = queryable.Select(item => new
+                                { 
+                                    item.EntryId,
+                                    item.JournalNo,
+                                    item.EntryDate,
+                                    item.EffectiveDate,
+                                    item.EntryBy,
+                                    item.Description,
+                                    TotalDebit = Convert.ToDecimal(item.TotalDebit).ToString("G29"),
+                                    TotalCredit = Convert.ToDecimal(item.TotalCredit).ToString("G29")
+                                }).ToList();
 
                 if (hasCriteria && !journalHDs.Any())
                 {
@@ -184,7 +194,16 @@ namespace APIPrototype.Controllers
                     hasCriteria = true;
                 }
 
-                var journalDTs = queryable.ToList();
+                var journalDTs = queryable.Select(item => new
+                                {
+                                    item.EntryId,
+                                    item.Seq, 
+                                    item.AccCode,
+                                    item.AccName,
+                                    item.AccDesc,
+                                    Debit = Convert.ToDecimal(item.Debit).ToString("G29"),
+                                    Credit = Convert.ToDecimal(item.Credit).ToString("G29")
+                                }).ToList();
 
                 if (hasCriteria && !journalDTs.Any())
                 {

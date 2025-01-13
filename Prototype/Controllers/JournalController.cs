@@ -236,6 +236,20 @@ namespace APIPrototype.Controllers
 
                 foreach (var obj in objs)
                 {
+                    if (obj.EntryId == 0)
+                    {
+                        return BadRequest("EntryId is required.");
+                    }
+
+                    var latestItem = _db.Acc_JournalDT
+                        .Where(x => x.EntryId == obj.EntryId)
+                        .OrderByDescending(x => x.Seq)
+                        .FirstOrDefault();
+
+                    int nextItemNo = latestItem == null ? 1 : latestItem.Seq + 1;
+
+                    obj.Seq = nextItemNo;
+
                     _db.Acc_JournalDT.Add(obj);
                 }
 

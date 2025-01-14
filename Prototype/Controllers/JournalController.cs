@@ -101,7 +101,7 @@ namespace APIPrototype.Controllers
                 }
                 _db.Acc_JournalHD.Add(obj);
                 _db.SaveChanges();
-                return Ok( new { message = "JournalHD Created.", accDocNo = obj.EntryId });
+                return Ok( new { message = "JournalHD Created.", entryId = obj.EntryId });
             }
             catch (Exception ex)
             {

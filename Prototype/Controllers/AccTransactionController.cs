@@ -234,6 +234,7 @@ namespace APIPrototype.Controllers
             string accDocNo = null,
             int? accItemNo = null,
             string accSourceDocNo = null,
+            int? accScourceItem = null,
             string saleProductCode = null)
         {
             try
@@ -257,6 +258,12 @@ namespace APIPrototype.Controllers
                 if (!string.IsNullOrEmpty(accSourceDocNo))
                 {
                     queryable = queryable.Where(item => item.AccSourceDocNo == accSourceDocNo);
+                    hasCriteria = true;
+                }
+
+                if (accScourceItem.HasValue)
+                {
+                    queryable = queryable.Where(item => item.AccSourceDocItem == accScourceItem.Value);
                     hasCriteria = true;
                 }
 

@@ -145,10 +145,16 @@ namespace APIPrototype.Controllers
                     return BadRequest("Data is invalid.");
                 }
 
+                var docConfig = _db.Mas_DocConfig.FirstOrDefault(dc => dc.Category == obj.AccDocType);
+                if (docConfig == null)
+                {
+                    return BadRequest("Invalid AccDocType. Prefix not found.");
+                }
+
                 var currentDate = DateTime.Now;
                 var gregorianYear = (currentDate.Year % 100).ToString("D2");
                 var month = currentDate.ToString("MM");
-                var runningNumberPrefix = $"{obj.AccDocType}{gregorianYear}{month}";
+                var runningNumberPrefix = $"{docConfig.Prefix}{gregorianYear}{month}";
 
                 var lastTransaction = _db.Acc_TransactionHD
                     .Where(t => t.AccDocNo.StartsWith(runningNumberPrefix))

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Text.Json;
 using static APIPrototype.Models.View_Model;
 
 namespace APIPrototype.Controllers
@@ -102,8 +103,25 @@ namespace APIPrototype.Controllers
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var row = Enumerable.Range(0, reader.FieldCount)
-                    .ToDictionary(reader.GetName, reader.GetValue);
+                /*                var row = Enumerable.Range(0, reader.FieldCount)
+                                    .ToDictionary(reader.GetName, reader.GetValue);
+                                result.Add(row);*/
+                var row = new Dictionary<string, object>();
+
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    string columnName = reader.GetName(i);
+                    object value = reader.GetValue(i);
+
+                    // ✅ ตรวจสอบค่าที่เป็น `DBNull` หรือ `{}` และเปลี่ยนเป็น `""`
+                    if (value is DBNull || (value is JsonElement json && json.ValueKind == JsonValueKind.Object && !json.EnumerateObject().Any()))
+                    {
+                        value = "";
+                    }
+
+                    row[columnName] = value;
+                }
+
                 result.Add(row);
             }
 

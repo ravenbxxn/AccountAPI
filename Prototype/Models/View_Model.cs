@@ -27,6 +27,8 @@ namespace APIPrototype.Models
 
             [Required]
             public string Value { get; set; }
+
+            public string UseOperator { get; set; } = "="; // ค่าเริ่มต้นเป็น '='
         }
 
         public class ResultField
@@ -35,6 +37,8 @@ namespace APIPrototype.Models
             public string SourceField { get; set; }
 
             public string? Alias { get; set; }
+
+            public string? Type { get; set; } // รองรับการกำหนดประเภทข้อมูล เช่น "double", "int"
         }
 
         public class JoinClause

@@ -108,7 +108,7 @@ namespace APIPrototype.Services
         {
             var parameters = new List<SqlParameter>();
 
-            foreach (var param in request.Parameters)
+            /*foreach (var param in request.Parameters)
             {
                 object value = param.Value is JsonElement jsonElement ? jsonElement.ValueKind switch
                 {
@@ -155,6 +155,86 @@ namespace APIPrototype.Services
                 }
 
                 // ส่งข้อมูลที่ได้จาก SELECT กลับไป
+                var result = new
+                {
+                    Data = resultList,
+                    Message = "Stored procedure executed successfully."
+                };
+
+                return result;
+            }*/
+
+            var dateParams = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "docdate", "duedate", "invdate", "createdate"
+            };
+
+            foreach (var param in request.Parameters)
+            {
+                object value;
+
+                if (param.Value is JsonElement jsonElement)
+                {
+                    // หากเป็นวันที่ (ส่งมารูปแบบ ISO)
+                    if (dateParams.Contains(param.Param)
+                        && jsonElement.ValueKind == JsonValueKind.String
+                        && DateTime.TryParse(jsonElement.GetString(), out var dt))
+                    {
+                        var sqlParam = new SqlParameter($"@{param.Param}", SqlDbType.Date)
+                        {
+                            Value = dt
+                        };
+                        parameters.Add(sqlParam);
+                        continue;
+                    }
+
+                    // แปลงชนิดทั่วไป
+                    value = jsonElement.ValueKind switch
+                    {
+                        JsonValueKind.String => jsonElement.GetString(),
+                        JsonValueKind.Number => jsonElement.TryGetInt32(out int intValue) ? intValue : (object)jsonElement.GetDouble(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        JsonValueKind.Null => DBNull.Value,
+                        _ => throw new InvalidOperationException("Unsupported JSON value type.")
+                    };
+                }
+                else
+                {
+                    value = param.Value;
+                }
+
+                parameters.Add(new SqlParameter($"@{param.Param}", value ?? DBNull.Value));
+            }
+
+            using (var command = _db.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = request.Name;
+                command.CommandType = CommandType.StoredProcedure;
+
+                foreach (var param in parameters)
+                {
+                    command.Parameters.Add(param);
+                }
+
+                if (command.Connection.State != ConnectionState.Open)
+                    await command.Connection.OpenAsync();
+
+                var resultList = new List<dynamic>();
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var row = new ExpandoObject() as IDictionary<string, object>;
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            row.Add(reader.GetName(i), reader.GetValue(i));
+                        }
+                        resultList.Add(row);
+                    }
+                }
+
                 var result = new
                 {
                     Data = resultList,

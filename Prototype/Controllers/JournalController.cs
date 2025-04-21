@@ -23,7 +23,8 @@ namespace APIPrototype.Controllers
                     string journalNo = null,
                     DateTime? entryDate = null,
                     DateTime? effectiveDate = null,
-                    string entryBy = null)
+                    string entryBy = null,
+                    string searchType = "equals")
         {
             try
             {
@@ -39,7 +40,18 @@ namespace APIPrototype.Controllers
 
                 if (!string.IsNullOrEmpty(journalNo))
                 {
-                    queryable = queryable.Where(item => item.JournalNo == journalNo);
+                    switch (searchType.ToLower())
+                    {
+                        case "startswith":
+                            queryable = queryable.Where(item => item.JournalNo.StartsWith(journalNo));
+                            break;
+                        case "contains":
+                            queryable = queryable.Where(item => item.JournalNo.Contains(journalNo));
+                            break;
+                        default: // "equals"
+                            queryable = queryable.Where(item => item.JournalNo == journalNo); ;
+                            break;
+                    }
                     hasCriteria = true;
                 }
 
@@ -69,8 +81,10 @@ namespace APIPrototype.Controllers
                                     item.EffectiveDate,
                                     item.EntryBy,
                                     item.Description,
-                                    TotalDebit = Convert.ToDecimal(item.TotalDebit).ToString("G29"),
-                                    TotalCredit = Convert.ToDecimal(item.TotalCredit).ToString("G29")
+                                    item.TotalDebit,
+                                    item.TotalCredit
+                                    //TotalDebit = Convert.ToDecimal(item.TotalDebit).ToString("G29"),
+                                    //TotalCredit = Convert.ToDecimal(item.TotalCredit).ToString("G29")
                                 }).ToList();
 
                 if (hasCriteria && !journalHDs.Any())

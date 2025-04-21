@@ -33,7 +33,7 @@ namespace APIPrototype.Controllers
                     ? "a.*"
                     : string.Join(", ", request.Results.Select(r => $"a.{r.SourceField} AS {r.Alias ?? r.SourceField}"));
 
-                // ✅ 2. สร้าง WHERE Clause
+                // ✅ 2. สร้าง WHERE Clause รองรับ Operator
                 List<string> whereConditions = new();
                 List<SqlParameter> sqlParameters = new();
 
@@ -42,14 +42,36 @@ namespace APIPrototype.Controllers
                     foreach (var param in request.Parameters)
                     {
                         string paramName = $"@{param.Field.Replace(".", "_")}";
-                        whereConditions.Add($"a.{param.Field} = {paramName}");
-                        sqlParameters.Add(new SqlParameter(paramName, param.Value ?? (object)DBNull.Value));
+
+                        // ✅ ตรวจสอบว่า Operator ที่ส่งมาเป็นตัวที่รองรับหรือไม่
+                        string validOperator = param.UseOperator switch
+                        {
+                            "!=" => "!=",
+                            ">" => ">",
+                            "<" => "<",
+                            ">=" => ">=",
+                            "<=" => "<=",
+                            "LIKE" => "LIKE",
+                            "NOT LIKE" => "NOT LIKE",
+                            _ => "=" // ถ้าไม่ได้ระบุให้ใช้ '=' เป็นค่าเริ่มต้น
+                        };
+
+                        whereConditions.Add($"a.{param.Field} {validOperator} {paramName}");
+
+                        // ถ้าใช้ LIKE ให้เพิ่ม Wildcard (%)
+                        object paramValue = param.Value;
+                        if (param.UseOperator == "LIKE" || param.UseOperator == "NOT LIKE")
+                        {
+                            paramValue = $"%{param.Value}%";
+                        }
+
+                        sqlParameters.Add(new SqlParameter(paramName, paramValue ?? (object)DBNull.Value));
                     }
                 }
 
                 // ✅ 3. สร้าง JOIN Clauses
                 string joinClause = "";
-                List<string> nullConditions = new(); // เก็บ `IS NULL` ไปใช้ใน `WHERE`
+                List<string> nullConditions = new();
 
                 if (request.Joins != null && request.Joins.Any())
                 {
@@ -74,7 +96,7 @@ namespace APIPrototype.Controllers
                 string sql = $"SELECT {selectClause} FROM {request.ViewName} AS a {joinClause} {whereClause}";
 
                 // ✅ 6. Execute SQL
-                var result = await ExecuteDynamicQueryAsync(sql, request.Parameters);
+                var result = await ExecuteDynamicQueryAsync(sql, sqlParameters, request.Results);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -83,8 +105,9 @@ namespace APIPrototype.Controllers
             }
         }
 
+
         private async Task<IEnumerable<Dictionary<string, object>>> ExecuteDynamicQueryAsync(
-            string sql, IEnumerable<Parameter> parameters)
+    string sql, List<SqlParameter> parameters, List<ResultField>? resultFields)
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             using var connection = new SqlConnection(connectionString);
@@ -93,19 +116,13 @@ namespace APIPrototype.Controllers
             using var command = new SqlCommand(sql, connection);
             if (parameters != null)
             {
-                foreach (var param in parameters)
-                {
-                    command.Parameters.AddWithValue($"@{param.Field}", param.Value);
-                }
+                command.Parameters.AddRange(parameters.ToArray());
             }
 
             var result = new List<Dictionary<string, object>>();
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                /*                var row = Enumerable.Range(0, reader.FieldCount)
-                                    .ToDictionary(reader.GetName, reader.GetValue);
-                                result.Add(row);*/
                 var row = new Dictionary<string, object>();
 
                 for (int i = 0; i < reader.FieldCount; i++)
@@ -113,10 +130,23 @@ namespace APIPrototype.Controllers
                     string columnName = reader.GetName(i);
                     object value = reader.GetValue(i);
 
-                    // ✅ ตรวจสอบค่าที่เป็น `DBNull` หรือ `{}` และเปลี่ยนเป็น `""`
-                    if (value is DBNull || (value is JsonElement json && json.ValueKind == JsonValueKind.Object && !json.EnumerateObject().Any()))
+                    // ✅ ตรวจสอบค่าที่เป็น `DBNull`
+                    if (value is DBNull)
                     {
                         value = "";
+                    }
+
+                    // ✅ ตรวจสอบว่ามีการกำหนด `Type` หรือไม่ แล้วแปลงค่าตามต้องการ
+                    var fieldType = resultFields?.FirstOrDefault(f => f.Alias == columnName || f.SourceField == columnName)?.Type;
+                    if (!string.IsNullOrEmpty(fieldType))
+                    {
+                        value = fieldType.ToLower() switch
+                        {
+                            "int" => Convert.ToInt32(value),
+                            "double" => Convert.ToDouble(value),
+                            "decimal" => Convert.ToDecimal(value),
+                            _ => value
+                        };
                     }
 
                     row[columnName] = value;
@@ -127,5 +157,6 @@ namespace APIPrototype.Controllers
 
             return result;
         }
+
     }
 }

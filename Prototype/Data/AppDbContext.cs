@@ -83,6 +83,9 @@ namespace APIPrototype.Data
 
         public DbSet<Mas_HREmployment> Mas_HREmployment { get; set; }
 
+        public DbSet<Mas_AccConfig> Mas_AccConfig { get; set; }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -114,6 +117,9 @@ namespace APIPrototype.Data
 
             modelBuilder.Entity<Mas_HREmployment>()
                         .HasKey(e => new { e.CompanyId, e.PositionId, e.StaffId });
+
+            modelBuilder.Entity<Mas_AccConfig>()
+                        .HasKey(e => new { e.ConfigCode, e.ConfigKey });
         }
     }
 }

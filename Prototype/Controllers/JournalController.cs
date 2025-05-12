@@ -113,6 +113,17 @@ namespace APIPrototype.Controllers
                 {
                     return BadRequest("Data is invalid.");
                 }
+
+                var checkobj = _db.Acc_JournalHD.Where(item => item.JournalNo == obj.JournalNo);
+                if (!checkobj.Any())
+                {
+                    _db.Acc_JournalHD.Add(obj);
+                }
+                else
+                {
+                    return BadRequest($"JournalNo : [{obj.JournalNo}] is already exsist.");
+                }
+
                 _db.Acc_JournalHD.Add(obj);
                 _db.SaveChanges();
                 return Ok( new { message = "JournalHD Created.", entryId = obj.EntryId });
@@ -133,15 +144,24 @@ namespace APIPrototype.Controllers
                 {
                     return BadRequest("Data is invalid.");
                 }
-                var journalHd = _db.Acc_JournalHD.Find(obj.EntryId);
-                if (journalHd == null)
+                var existingJournalHd = _db.Acc_JournalHD.Find(obj.EntryId);
+                if (existingJournalHd == null)
                 {
                     return BadRequest($"JournalHD not found with ID: {obj.EntryId}.");
+                }
+
+                if (existingJournalHd.JournalNo != obj.JournalNo)
+                {
+                    var duplicateJournalHd = _db.Acc_JournalHD.Any(item => item.JournalNo == obj.JournalNo && item.EntryId != obj.EntryId);
+                    if (duplicateJournalHd)
+                    {
+                        return BadRequest($"JournalNo : [{obj.JournalNo}] is already exist.");
+                    }
                 }
                 foreach (PropertyInfo property in typeof(Acc_JournalHD).GetProperties().Where(p => p.CanRead))
                 {
                     string propertyName = property.Name;
-                    property.SetValue(journalHd, property.GetValue(obj, null));
+                    property.SetValue(existingJournalHd, property.GetValue(obj, null));
                 }
                 _db.SaveChanges();
                 return Ok("JournalHD datail updated.");
